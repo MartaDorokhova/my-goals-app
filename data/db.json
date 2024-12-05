@@ -1,0 +1,144 @@
+{
+  "goals": [
+    {
+      "id": 3,
+      "title": "Изучить Swagger",
+      "completed": true,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 4,
+      "title": "Подготовить пространство в конфлюенс для заведения проблемных участков кода для обсуждения",
+      "completed": false,
+      "inProgress": false,
+      "canceled": true
+    },
+    {
+      "id": 6,
+      "title": "Понять концепции и преимущества рендеринга на стороне сервера (SSR)",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 7,
+      "title": "Изучить GraphQL и его отличие от REST",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 8,
+      "title": "Прочитать книгу по JavaScript для углубленного изучения",
+      "completed": false,
+      "inProgress": false,
+      "canceled": true
+    },
+    {
+      "id": 9,
+      "title": "Настроить Docker для разработки на локальной машине",
+      "completed": true,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 10,
+      "title": "Изучить принципы работы с WebSockets",
+      "completed": false,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 11,
+      "title": "Познакомиться с основами Kubernetes",
+      "completed": false,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 12,
+      "title": "Обновить личный проект на GitHub",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 13,
+      "title": "Научиться работать с Redux",
+      "completed": true,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 14,
+      "title": "Создать бэкенд для личного приложения на Node.js",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 15,
+      "title": "Углубленно изучить функциональное программирование",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 16,
+      "title": "Погрузиться в разработку мобильных приложений с использованием React Native",
+      "completed": false,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 17,
+      "title": "Изучить методы оптимизации производительности веб-приложений",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 18,
+      "title": "Написать тесты для существующих компонентов на React",
+      "completed": true,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 19,
+      "title": "Обновить документацию по проекту на GitHub",
+      "completed": true,
+      "inProgress": false,
+      "canceled": false
+    },
+    {
+      "id": 20,
+      "title": "Изучить основы анимации в CSS",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 21,
+      "title": "Изучить систему контроля версий Git и ее команды",
+      "completed": false,
+      "inProgress": false,
+      "canceled": true
+    },
+    {
+      "id": 22,
+      "title": "Настроить CI/CD для автоматической сборки проектов",
+      "completed": false,
+      "inProgress": true,
+      "canceled": false
+    },
+    {
+      "id": 23,
+      "title": "Познакомиться с основами разработки на Python",
+      "completed": false,
+      "inProgress": false,
+      "canceled": false
+    }
+  ]
+}
