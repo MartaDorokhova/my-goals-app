@@ -209,6 +209,9 @@ export default function Goals() {
           Добавить цель
         </button>
       </Form>
+      <Link to="/" style={{ fontSize: "18px", textDecoration: "none", color: "#4caf50" }}>
+        🏠 На главную
+      </Link>
     </div>
   );
 }
