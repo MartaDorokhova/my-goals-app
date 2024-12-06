@@ -1,8 +1,8 @@
 import { ActionFunction, LoaderFunction, json } from "@remix-run/node";
 import { Form, Link, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { useState } from "react";
-import type { Goal } from "~/models/goal";
-import * as goalService from "~/services/goals.server";
+import type { Goal } from "../models/types";
+import * as goalService from "../services/goals.server";
 
 type LoaderData = {
   goals: Goal[];
@@ -24,35 +24,35 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const actionType = formData.get("_action");
 
-  switch (actionType) {
-    case "save": {
-      const goals = await goalService.getGoals();
-      const updatedGoals = await Promise.all(
-        goals.map(async (goal) => {
-          const updates = {
-            title: formData.get(`goal-${goal.id}`)?.toString() || goal.title,
-            completed: formData.get(`completed-${goal.id}`) === "on",
-            inProgress: formData.get(`inProgress-${goal.id}`) === "on",
-            canceled: formData.get(`canceled-${goal.id}`) === "on",
-          };
-          return goalService.updateGoal(goal.id, updates);
-        })
-      );
-      return json({ success: true });
-    }
-    case "add": {
-      const title = formData.get("title")?.toString() || "Новая цель";
-      await goalService.addGoal(title);
-      return json({ success: true });
-    }
-    case "delete": {
-      const id = parseInt(formData.get("id")?.toString() || "0", 10);
-      await goalService.deleteGoal(id);
-      return json({ success: true });
-    }
-    default:
-      return json({ error: "Invalid action" }, { status: 400 });
+  if (actionType === "save") {
+    const goals = await goalService.getGoals();
+    await Promise.all(
+      goals.map(async (goal) => {
+        const updates = {
+          title: formData.get(`goal-${goal.id}`)?.toString() || goal.title,
+          completed: formData.get(`completed-${goal.id}`) === "on",
+          inProgress: formData.get(`inProgress-${goal.id}`) === "on",
+          canceled: formData.get(`canceled-${goal.id}`) === "on",
+        };
+        return goalService.updateGoal(goal.id, updates);
+      })
+    );
+    return json({ success: true });
   }
+
+  if (actionType === "add") {
+    const title = formData.get("title")?.toString() || "Новая цель";
+    await goalService.addGoal(title);
+    return json({ success: true });
+  }
+
+  if (actionType === "delete") {
+    const id = parseInt(formData.get("id")?.toString() || "0", 10);
+    await goalService.deleteGoal(id);
+    return json({ success: true });
+  }
+
+  return json({ error: "Invalid action" }, { status: 400 });
 };
 
 export default function Goals() {
@@ -63,66 +63,81 @@ export default function Goals() {
   
   const isLoading = navigation.state === "submitting";
 
+  const handleEditClick = () => {
+    console.log('Edit button clicked, current state:', isEdit);
+    setIsEdit(!isEdit);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const form = event.currentTarget;
+    const submitter = (event as any).nativeEvent.submitter;
+    
+    if (submitter?.name === "_action" && submitter?.value === "save") {
+      submit(form, { method: "post" });
+      setIsEdit(false);
+    } else {
+      submit(form, { method: "post" });
+    }
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Список целей</h2>
-        <div className="flex gap-4">
+    <div className="goals-container">
+      <div className="goals-header">
+        <h2 className="goals-title">Список целей</h2>
+        <div className="header-buttons">
           <Link
             to="/statistics"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            className="btn btn-primary"
             prefetch="intent"
           >
             Статистика
           </Link>
           <button
-            onClick={() => setIsEdit(!isEdit)}
-            className={`px-4 py-2 text-white rounded transition ${
-              isEdit ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-            }`}
-            disabled={isLoading}
+            type="button"
+            onClick={handleEditClick}
+            className={`btn ${isEdit ? 'btn-danger' : 'btn-success'}`}
           >
             {isEdit ? "Отменить" : "Редактировать"}
           </button>
         </div>
       </div>
 
-      <Form method="post" className="space-y-4">
+      <Form method="post" className="goals-list" onSubmit={handleSubmit}>
         {goals.map((goal) => (
-          <div
-            key={goal.id}
-            className="p-4 bg-white rounded-lg shadow-sm flex items-center gap-4"
-          >
+          <div key={goal.id} className="goal-item">
             {isEdit ? (
               <>
                 <input
                   type="text"
                   name={`goal-${goal.id}`}
                   defaultValue={goal.title}
-                  className="flex-1 p-2 border rounded"
+                  className="goal-input"
                 />
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2">
+                <div className="checkbox-group">
+                  <label className="checkbox-label">
                     <input
                       type="checkbox"
                       name={`completed-${goal.id}`}
                       defaultChecked={goal.completed}
+                      className="checkbox-input"
                     />
                     Выполнено
                   </label>
-                  <label className="flex items-center gap-2">
+                  <label className="checkbox-label">
                     <input
                       type="checkbox"
                       name={`inProgress-${goal.id}`}
                       defaultChecked={goal.inProgress}
+                      className="checkbox-input"
                     />
                     В процессе
                   </label>
-                  <label className="flex items-center gap-2">
+                  <label className="checkbox-label">
                     <input
                       type="checkbox"
                       name={`canceled-${goal.id}`}
                       defaultChecked={goal.canceled}
+                      className="checkbox-input"
                     />
                     Отменено
                   </label>
@@ -137,44 +152,44 @@ export default function Goals() {
                       form.set("id", goal.id.toString());
                       submit(form, { method: "post" });
                     }}
-                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                    className="btn btn-danger"
                   >
                     Удалить
                   </button>
                 </div>
               </>
             ) : (
-              <>
-                <span className="flex-1">{goal.title}</span>
-                <div className="flex gap-2">
+              <div className="goal-content">
+                <span className="goal-title">{goal.title}</span>
+                <div className="goal-status">
                   {goal.completed && (
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    <span className="status-tag status-completed">
                       Выполнено
                     </span>
                   )}
                   {goal.inProgress && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                    <span className="status-tag status-in-progress">
                       В процессе
                     </span>
                   )}
                   {goal.canceled && (
-                    <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+                    <span className="status-tag status-canceled">
                       Отменено
                     </span>
                   )}
                 </div>
-              </>
+              </div>
             )}
           </div>
         ))}
 
         {isEdit && (
-          <div className="flex justify-end gap-4">
+          <div className="header-buttons">
             <button
               type="submit"
               name="_action"
               value="save"
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+              className="btn btn-success"
               disabled={isLoading}
             >
               {isLoading ? "Сохранение..." : "Сохранить"}
@@ -183,12 +198,12 @@ export default function Goals() {
         )}
       </Form>
 
-      <Form method="post" className="mt-6">
+      <Form method="post" onSubmit={handleSubmit}>
         <button
           type="submit"
           name="_action"
           value="add"
-          className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          className="add-goal-button"
           disabled={isLoading}
         >
           Добавить цель

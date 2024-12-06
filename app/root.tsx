@@ -6,9 +6,9 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
-import styles from "~/styles/tailwind.css";
 
 export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: "/app/styles/goals.css" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -23,14 +23,14 @@ export const links: LinksFunction = () => [
 
 export default function Root() {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body className="h-full bg-gray-50">
+      <body style={{ margin: 0, backgroundColor: '#f8fafc' }}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

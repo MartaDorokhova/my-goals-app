@@ -125,20 +125,6 @@
       "completed": false,
       "inProgress": false,
       "canceled": true
-    },
-    {
-      "id": 22,
-      "title": "Настроить CI/CD для автоматической сборки проектов",
-      "completed": false,
-      "inProgress": true,
-      "canceled": false
-    },
-    {
-      "id": 23,
-      "title": "Познакомиться с основами разработки на Python",
-      "completed": false,
-      "inProgress": false,
-      "canceled": false
     }
   ]
 }
