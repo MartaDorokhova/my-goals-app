@@ -1,14 +1,12 @@
+export type GoalStatus = 'completed' | 'inProgress' | 'canceled' | 'notStarted';
+
 export interface Goal {
   id: number;
   title: string;
-  completed: boolean;
-  inProgress: boolean;
-  canceled: boolean;
+  status: GoalStatus;
 }
 
 export interface GoalFormData {
   title: string;
-  completed: boolean;
-  inProgress: boolean;
-  canceled: boolean;
+  status: GoalStatus;
 }

@@ -1,7 +1,7 @@
 import { ActionFunction, LoaderFunction, json } from "@remix-run/node";
 import { Form, Link, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { useState } from "react";
-import type { Goal } from "../models/types";
+import type { Goal, GoalStatus } from "../models/types";
 import * as goalService from "../services/goals.server";
 
 type LoaderData = {
@@ -25,18 +25,15 @@ export const action: ActionFunction = async ({ request }) => {
   const actionType = formData.get("_action");
 
   if (actionType === "save") {
-    const goals = await goalService.getGoals();
-    await Promise.all(
-      goals.map(async (goal) => {
-        const updates = {
-          title: formData.get(`goal-${goal.id}`)?.toString() || goal.title,
-          completed: formData.get(`completed-${goal.id}`) === "on",
-          inProgress: formData.get(`inProgress-${goal.id}`) === "on",
-          canceled: formData.get(`canceled-${goal.id}`) === "on",
-        };
-        return goalService.updateGoal(goal.id, updates);
-      })
-    );
+    const goalId = parseInt(formData.get("goalId")?.toString() || "0", 10);
+    const status = formData.get("status")?.toString() as GoalStatus;
+    const title = formData.get("title")?.toString() || "";
+
+    await goalService.updateGoal(goalId, {
+      title,
+      status,
+    });
+    
     return json({ success: true });
   }
 
@@ -106,41 +103,65 @@ export default function Goals() {
         {goals.map((goal) => (
           <div key={goal.id} className="goal-item">
             {isEdit ? (
-              <>
+              <Form method="post" className="goal-edit-form">
                 <input
                   type="text"
-                  name={`goal-${goal.id}`}
+                  name="title"
                   defaultValue={goal.title}
                   className="goal-input"
                 />
-                <div className="checkbox-group">
-                  <label className="checkbox-label">
+                <div className="radio-group">
+                  <label className="radio-label">
                     <input
-                      type="checkbox"
-                      name={`completed-${goal.id}`}
-                      defaultChecked={goal.completed}
-                      className="checkbox-input"
+                      type="radio"
+                      name="status"
+                      value="completed"
+                      defaultChecked={goal.status === 'completed'}
+                      className="radio-input"
                     />
                     Выполнено
                   </label>
-                  <label className="checkbox-label">
+                  <label className="radio-label">
                     <input
-                      type="checkbox"
-                      name={`inProgress-${goal.id}`}
-                      defaultChecked={goal.inProgress}
-                      className="checkbox-input"
+                      type="radio"
+                      name="status"
+                      value="inProgress"
+                      defaultChecked={goal.status === 'inProgress'}
+                      className="radio-input"
                     />
                     В процессе
                   </label>
-                  <label className="checkbox-label">
+                  <label className="radio-label">
                     <input
-                      type="checkbox"
-                      name={`canceled-${goal.id}`}
-                      defaultChecked={goal.canceled}
-                      className="checkbox-input"
+                      type="radio"
+                      name="status"
+                      value="canceled"
+                      defaultChecked={goal.status === 'canceled'}
+                      className="radio-input"
                     />
                     Отменено
                   </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="status"
+                      value="notStarted"
+                      defaultChecked={goal.status === 'notStarted'}
+                      className="radio-input"
+                    />
+                    Не начато
+                  </label>
+                </div>
+                <div className="goal-actions">
+                  <input type="hidden" name="goalId" value={goal.id} />
+                  <button
+                    type="submit"
+                    name="_action"
+                    value="save"
+                    className="btn btn-success"
+                  >
+                    Сохранить
+                  </button>
                   <button
                     type="submit"
                     name="_action"
@@ -157,24 +178,29 @@ export default function Goals() {
                     Удалить
                   </button>
                 </div>
-              </>
+              </Form>
             ) : (
               <div className="goal-content">
                 <span className="goal-title">{goal.title}</span>
                 <div className="goal-status">
-                  {goal.completed && (
+                  {goal.status === 'completed' && (
                     <span className="status-tag status-completed">
                       Выполнено
                     </span>
                   )}
-                  {goal.inProgress && (
+                  {goal.status === 'inProgress' && (
                     <span className="status-tag status-in-progress">
                       В процессе
                     </span>
                   )}
-                  {goal.canceled && (
+                  {goal.status === 'canceled' && (
                     <span className="status-tag status-canceled">
                       Отменено
+                    </span>
+                  )}
+                  {goal.status === 'notStarted' && (
+                    <span className="status-tag status-not-started">
+                      Не начато
                     </span>
                   )}
                 </div>
@@ -182,20 +208,6 @@ export default function Goals() {
             )}
           </div>
         ))}
-
-        {isEdit && (
-          <div className="header-buttons">
-            <button
-              type="submit"
-              name="_action"
-              value="save"
-              className="btn btn-success"
-              disabled={isLoading}
-            >
-              {isLoading ? "Сохранение..." : "Сохранить"}
-            </button>
-          </div>
-        )}
       </Form>
 
       <Form method="post" onSubmit={handleSubmit}>

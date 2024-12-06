@@ -19,9 +19,7 @@ export async function addGoal(title: string): Promise<Goal> {
   const newGoal: Goal = {
     id: goals.length ? goals[goals.length - 1].id + 1 : 1,
     title,
-    completed: false,
-    inProgress: false,
-    canceled: false,
+    status: 'notStarted'
   };
   goals.push(newGoal);
   await saveGoals(goals);

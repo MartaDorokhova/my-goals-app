@@ -3,16 +3,18 @@
     {
       "id": 3,
       "title": "Изучить Swagger",
-      "completed": true,
-      "inProgress": false,
-      "canceled": false
+      "completed": false,
+      "inProgress": true,
+      "canceled": false,
+      "status": "inProgress"
     },
     {
       "id": 4,
       "title": "Подготовить пространство в конфлюенс для заведения проблемных участков кода для обсуждения",
-      "completed": false,
+      "completed": true,
       "inProgress": false,
-      "canceled": true
+      "canceled": false,
+      "status": "completed"
     },
     {
       "id": 6,
@@ -47,7 +49,8 @@
       "title": "Изучить принципы работы с WebSockets",
       "completed": false,
       "inProgress": false,
-      "canceled": false
+      "canceled": false,
+      "status": "inProgress"
     },
     {
       "id": 11,
@@ -82,13 +85,6 @@
       "title": "Углубленно изучить функциональное программирование",
       "completed": false,
       "inProgress": true,
-      "canceled": false
-    },
-    {
-      "id": 16,
-      "title": "Погрузиться в разработку мобильных приложений с использованием React Native",
-      "completed": false,
-      "inProgress": false,
       "canceled": false
     },
     {

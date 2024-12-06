@@ -10,9 +10,7 @@ ChartJS.register(Title, Tooltip, Legend, ArcElement);
 type Goal = {
   id: number;
   title: string;
-  completed: boolean;
-  inProgress: boolean;
-  canceled: boolean;
+  status: string;
 };
 
 type LoaderData = {
@@ -32,12 +30,10 @@ export default function Statistics() {
   const { goals } = useLoaderData<LoaderData>();
   const total = goals.length;
 
-  const completed = goals.filter((goal) => goal.completed).length;
-  const inProgress = goals.filter((goal) => goal.inProgress).length;
-  const canceled = goals.filter((goal) => goal.canceled).length;
-  const notStarted = goals.filter(
-    (goal) => !goal.completed && !goal.inProgress && !goal.canceled
-  ).length;
+  const completed = goals.filter((goal) => goal.status === 'completed').length;
+  const inProgress = goals.filter((goal) => goal.status === 'inProgress').length;
+  const canceled = goals.filter((goal) => goal.status === 'canceled').length;
+  const notStarted = goals.filter((goal) => goal.status === 'notStarted').length;
 
   const chartData = {
     labels: ["Завершено", "В работе", "Отменено", "Не начато"],
