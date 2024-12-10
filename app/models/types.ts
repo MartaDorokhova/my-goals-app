@@ -1,4 +1,4 @@
-export type GoalStatus = 'completed' | 'inProgress' | 'canceled' | 'notStarted';
+export type GoalStatus = "completed" | "inProgress" | "canceled" | "notStarted";
 
 export interface Goal {
   id: number;

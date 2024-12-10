@@ -1,11 +1,22 @@
 import { ActionFunction, LoaderFunction, json } from "@remix-run/node";
-import { Form, Link, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
-import { useState } from "react";
-import type { Goal, GoalStatus } from "../models/types";
+import {
+  Link,
+  useLoaderData,
+  useNavigation,
+  useActionData,
+  useSubmit,
+} from "@remix-run/react";
+import { useState, useEffect } from "react";
+import type { Goal } from "../models/types";
 import * as goalService from "../services/goals.server";
 
 type LoaderData = {
   goals: Goal[];
+};
+
+type ActionData = {
+  success?: boolean;
+  error?: string;
 };
 
 export const loader: LoaderFunction = async () => {
@@ -16,189 +27,190 @@ export const loader: LoaderFunction = async () => {
       headers: {
         "Cache-Control": "private, max-age=60",
       },
-    }
+    },
   );
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const actionType = formData.get("_action");
+  const data = await request.json();
+  const actionType = data._action;
 
-  if (actionType === "save") {
-    const goalId = parseInt(formData.get("goalId")?.toString() || "0", 10);
-    const status = formData.get("status")?.toString() as GoalStatus;
-    const title = formData.get("title")?.toString() || "";
+  try {
+    if (actionType === "save") {
+      const { goalId, status, title } = data;
 
-    await goalService.updateGoal(goalId, {
-      title,
-      status,
-    });
-    
-    return json({ success: true });
+      if (!goalId || !status || !title) {
+        return json<ActionData>(
+          { error: "Missing required fields" },
+          { status: 400 },
+        );
+      }
+
+      await goalService.updateGoal(goalId, {
+        title,
+        status,
+      });
+
+      return json<ActionData>({ success: true });
+    }
+
+    if (actionType === "add") {
+      const { title = "Новая цель" } = data;
+      await goalService.addGoal(title);
+      return json<ActionData>({ success: true });
+    }
+
+    if (actionType === "delete") {
+      const { id } = data;
+      if (!id) {
+        return json<ActionData>({ error: "Missing id" }, { status: 400 });
+      }
+      await goalService.deleteGoal(id);
+      return json<ActionData>({ success: true });
+    }
+
+    return json<ActionData>({ error: "Invalid action" }, { status: 400 });
+  } catch (error) {
+    console.error("Action error:", error);
+    return json<ActionData>({ error: "An error occurred" }, { status: 500 });
   }
-
-  if (actionType === "add") {
-    const title = formData.get("title")?.toString() || "Новая цель";
-    await goalService.addGoal(title);
-    return json({ success: true });
-  }
-
-  if (actionType === "delete") {
-    const id = parseInt(formData.get("id")?.toString() || "0", 10);
-    await goalService.deleteGoal(id);
-    return json({ success: true });
-  }
-
-  return json({ error: "Invalid action" }, { status: 400 });
 };
 
 export default function Goals() {
   const { goals } = useLoaderData<LoaderData>();
-  const [isEdit, setIsEdit] = useState(false);
+  const actionData = useActionData<ActionData>();
   const navigation = useNavigation();
   const submit = useSubmit();
-  
+  const [isEdit, setIsEdit] = useState(false);
+
   const isLoading = navigation.state === "submitting";
 
+  useEffect(() => {
+    if (actionData?.success && navigation.state === "idle") {
+      setIsEdit(false);
+    }
+  }, [actionData, navigation.state]);
+
   const handleEditClick = () => {
-    console.log('Edit button clicked, current state:', isEdit);
     setIsEdit(!isEdit);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    const form = event.currentTarget;
-    const submitter = (event as any).nativeEvent.submitter;
-    
-    if (submitter?.name === "_action" && submitter?.value === "save") {
-      submit(form, { method: "post" });
-      setIsEdit(false);
-    } else {
-      submit(form, { method: "post" });
-    }
+  const handleSubmit = (actionType: string, data: any) => {
+    submit(
+      { ...data, _action: actionType },
+      { method: "post", encType: "application/json" },
+    );
   };
 
   return (
     <div className="goals-container">
+      {actionData?.error && (
+        <div className="error-message" role="alert">
+          {actionData.error}
+        </div>
+      )}
       <div className="goals-header">
         <h2 className="goals-title">Список целей</h2>
         <div className="header-buttons">
-          <Link
-            to="/statistics"
-            className="btn btn-primary"
-            prefetch="intent"
-          >
+          <Link to="/statistics" className="btn btn-primary" prefetch="intent">
             Статистика
           </Link>
           <button
             type="button"
             onClick={handleEditClick}
-            className={`btn ${isEdit ? 'btn-danger' : 'btn-success'}`}
+            className={`btn ${isEdit ? "btn-danger" : "btn-success"}`}
+            disabled={isLoading}
           >
             {isEdit ? "Отменить" : "Редактировать"}
           </button>
         </div>
       </div>
 
-      <Form method="post" className="goals-list" onSubmit={handleSubmit}>
+      <div className="goals-list">
         {goals.map((goal) => (
           <div key={goal.id} className="goal-item">
             {isEdit ? (
-              <Form method="post" className="goal-edit-form">
+              <div className="goal-edit-form">
                 <input
                   type="text"
-                  name="title"
                   defaultValue={goal.title}
                   className="goal-input"
+                  onChange={(e) => {
+                    const formData = {
+                      goalId: goal.id,
+                      title: e.target.value,
+                      status: goal.status,
+                    };
+                    handleSubmit("save", formData);
+                  }}
+                  required
                 />
                 <div className="radio-group">
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="status"
-                      value="completed"
-                      defaultChecked={goal.status === 'completed'}
-                      className="radio-input"
-                    />
-                    Выполнено
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="status"
-                      value="inProgress"
-                      defaultChecked={goal.status === 'inProgress'}
-                      className="radio-input"
-                    />
-                    В процессе
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="status"
-                      value="canceled"
-                      defaultChecked={goal.status === 'canceled'}
-                      className="radio-input"
-                    />
-                    Отменено
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="status"
-                      value="notStarted"
-                      defaultChecked={goal.status === 'notStarted'}
-                      className="radio-input"
-                    />
-                    Не начато
-                  </label>
+                  {(
+                    [
+                      "completed",
+                      "inProgress",
+                      "canceled",
+                      "notStarted",
+                    ] as const
+                  ).map((status) => (
+                    <label key={status} className="radio-label">
+                      <input
+                        type="radio"
+                        name={`status-${goal.id}`}
+                        value={status}
+                        checked={goal.status === status}
+                        className="radio-input"
+                        onChange={() => {
+                          const formData = {
+                            goalId: goal.id,
+                            title: goal.title,
+                            status,
+                          };
+                          handleSubmit("save", formData);
+                        }}
+                        required
+                      />
+                      {status === "completed" && "Выполнено"}
+                      {status === "inProgress" && "В процессе"}
+                      {status === "canceled" && "Отменено"}
+                      {status === "notStarted" && "Не начато"}
+                    </label>
+                  ))}
                 </div>
                 <div className="goal-actions">
-                  <input type="hidden" name="goalId" value={goal.id} />
                   <button
-                    type="submit"
-                    name="_action"
-                    value="save"
-                    className="btn btn-success"
-                  >
-                    Сохранить
-                  </button>
-                  <button
-                    type="submit"
-                    name="_action"
-                    value="delete"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const form = new FormData();
-                      form.set("_action", "delete");
-                      form.set("id", goal.id.toString());
-                      submit(form, { method: "post" });
-                    }}
+                    type="button"
                     className="btn btn-danger"
+                    disabled={isLoading}
+                    onClick={() => {
+                      if (confirm("Вы уверены, что хотите удалить эту цель?")) {
+                        handleSubmit("delete", { id: goal.id });
+                      }
+                    }}
                   >
-                    Удалить
+                    {isLoading ? "Удаление..." : "Удалить"}
                   </button>
                 </div>
-              </Form>
+              </div>
             ) : (
               <div className="goal-content">
                 <span className="goal-title">{goal.title}</span>
                 <div className="goal-status">
-                  {goal.status === 'completed' && (
+                  {goal.status === "completed" && (
                     <span className="status-tag status-completed">
                       Выполнено
                     </span>
                   )}
-                  {goal.status === 'inProgress' && (
+                  {goal.status === "inProgress" && (
                     <span className="status-tag status-in-progress">
                       В процессе
                     </span>
                   )}
-                  {goal.status === 'canceled' && (
-                    <span className="status-tag status-canceled">
-                      Отменено
-                    </span>
+                  {goal.status === "canceled" && (
+                    <span className="status-tag status-canceled">Отменено</span>
                   )}
-                  {goal.status === 'notStarted' && (
+                  {goal.status === "notStarted" && (
                     <span className="status-tag status-not-started">
                       Не начато
                     </span>
@@ -208,20 +220,23 @@ export default function Goals() {
             )}
           </div>
         ))}
-      </Form>
+      </div>
 
-      <Form method="post" onSubmit={handleSubmit}>
+      {isEdit && (
         <button
-          type="submit"
-          name="_action"
-          value="add"
+          type="button"
           className="add-goal-button"
           disabled={isLoading}
+          onClick={() => handleSubmit("add", {})}
         >
-          Добавить цель
+          {isLoading ? "Добавление..." : "Добавить цель"}
         </button>
-      </Form>
-      <Link to="/" style={{ fontSize: "18px", textDecoration: "none", color: "#4caf50" }}>
+      )}
+
+      <Link
+        to="/"
+        style={{ fontSize: "18px", textDecoration: "none", color: "#4caf50" }}
+      >
         🏠 На главную
       </Link>
     </div>

@@ -30,10 +30,14 @@ export default function Statistics() {
   const { goals } = useLoaderData<LoaderData>();
   const total = goals.length;
 
-  const completed = goals.filter((goal) => goal.status === 'completed').length;
-  const inProgress = goals.filter((goal) => goal.status === 'inProgress').length;
-  const canceled = goals.filter((goal) => goal.status === 'canceled').length;
-  const notStarted = goals.filter((goal) => goal.status === 'notStarted').length;
+  const completed = goals.filter((goal) => goal.status === "completed").length;
+  const inProgress = goals.filter(
+    (goal) => goal.status === "inProgress",
+  ).length;
+  const canceled = goals.filter((goal) => goal.status === "canceled").length;
+  const notStarted = goals.filter(
+    (goal) => goal.status === "notStarted",
+  ).length;
 
   const chartData = {
     labels: ["Завершено", "В работе", "Отменено", "Не начато"],
@@ -48,21 +52,36 @@ export default function Statistics() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>Статистика по целям</h2>
+      <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>
+        Статистика по целям
+      </h2>
 
       <div style={{ width: "100%", height: "400px" }}>
         <Pie data={chartData} />
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <p><strong>Общее количество целей:</strong> {total}</p>
-        <p><strong>Завершено:</strong> {completed}</p>
-        <p><strong>В работе:</strong> {inProgress}</p>
-        <p><strong>Отменено:</strong> {canceled}</p>
-        <p><strong>Не начато:</strong> {notStarted}</p>
+        <p>
+          <strong>Общее количество целей:</strong> {total}
+        </p>
+        <p>
+          <strong>Завершено:</strong> {completed}
+        </p>
+        <p>
+          <strong>В работе:</strong> {inProgress}
+        </p>
+        <p>
+          <strong>Отменено:</strong> {canceled}
+        </p>
+        <p>
+          <strong>Не начато:</strong> {notStarted}
+        </p>
       </div>
 
-      <Link to="/" style={{ fontSize: "18px", textDecoration: "none", color: "#4caf50" }}>
+      <Link
+        to="/"
+        style={{ fontSize: "18px", textDecoration: "none", color: "#4caf50" }}
+      >
         🏠 На главную
       </Link>
     </div>

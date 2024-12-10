@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import {Goal} from '../models/types.js'
+import { Goal } from "../models/types.js";
 
 const dbPath = path.resolve("data/db.json");
 
@@ -19,7 +19,7 @@ export async function addGoal(title: string): Promise<Goal> {
   const newGoal: Goal = {
     id: goals.length ? goals[goals.length - 1].id + 1 : 1,
     title,
-    status: 'notStarted'
+    status: "notStarted",
   };
   goals.push(newGoal);
   await saveGoals(goals);
@@ -32,13 +32,16 @@ export async function deleteGoal(id: number): Promise<void> {
   await saveGoals(updatedGoals);
 }
 
-export async function updateGoal(id: number, updates: Partial<Goal>): Promise<Goal> {
+export async function updateGoal(
+  id: number,
+  updates: Partial<Goal>,
+): Promise<Goal> {
   const goals = await getGoals();
   const goalIndex = goals.findIndex((goal) => goal.id === id);
   if (goalIndex === -1) {
     throw new Error(`Goal with id ${id} not found`);
   }
-  
+
   goals[goalIndex] = { ...goals[goalIndex], ...updates };
   await saveGoals(goals);
   return goals[goalIndex];

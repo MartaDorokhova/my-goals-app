@@ -30,7 +30,7 @@ export default function Root() {
         <Meta />
         <Links />
       </head>
-      <body style={{ margin: 0, backgroundColor: '#f8fafc' }}>
+      <body style={{ margin: 0, backgroundColor: "#f8fafc" }}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

@@ -6,7 +6,7 @@
       "completed": false,
       "inProgress": true,
       "canceled": false,
-      "status": "inProgress"
+      "status": "completed"
     },
     {
       "id": 4,
@@ -14,7 +14,7 @@
       "completed": true,
       "inProgress": false,
       "canceled": false,
-      "status": "completed"
+      "status": "inProgress"
     },
     {
       "id": 6,
@@ -24,33 +24,20 @@
       "canceled": false
     },
     {
-      "id": 7,
-      "title": "Изучить GraphQL и его отличие от REST",
-      "completed": false,
-      "inProgress": true,
-      "canceled": false
-    },
-    {
       "id": 8,
       "title": "Прочитать книгу по JavaScript для углубленного изучения",
       "completed": false,
       "inProgress": false,
-      "canceled": true
+      "canceled": true,
+      "status": "inProgress"
     },
     {
       "id": 9,
       "title": "Настроить Docker для разработки на локальной машине",
       "completed": true,
       "inProgress": false,
-      "canceled": false
-    },
-    {
-      "id": 10,
-      "title": "Изучить принципы работы с WebSockets",
-      "completed": false,
-      "inProgress": false,
       "canceled": false,
-      "status": "inProgress"
+      "status": "canceled"
     },
     {
       "id": 11,
@@ -79,48 +66,6 @@
       "completed": false,
       "inProgress": true,
       "canceled": false
-    },
-    {
-      "id": 15,
-      "title": "Углубленно изучить функциональное программирование",
-      "completed": false,
-      "inProgress": true,
-      "canceled": false
-    },
-    {
-      "id": 17,
-      "title": "Изучить методы оптимизации производительности веб-приложений",
-      "completed": false,
-      "inProgress": true,
-      "canceled": false
-    },
-    {
-      "id": 18,
-      "title": "Написать тесты для существующих компонентов на React",
-      "completed": true,
-      "inProgress": false,
-      "canceled": false
-    },
-    {
-      "id": 19,
-      "title": "Обновить документацию по проекту на GitHub",
-      "completed": true,
-      "inProgress": false,
-      "canceled": false
-    },
-    {
-      "id": 20,
-      "title": "Изучить основы анимации в CSS",
-      "completed": false,
-      "inProgress": true,
-      "canceled": false
-    },
-    {
-      "id": 21,
-      "title": "Изучить систему контроля версий Git и ее команды",
-      "completed": false,
-      "inProgress": false,
-      "canceled": true
     }
   ]
 }
