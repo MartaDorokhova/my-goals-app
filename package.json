@@ -18,17 +18,10 @@
       "git add"
     ]
   },
-  "resolutions": {
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
-  },
   "dependencies": {
     "@emotion/css": "^11.13.5",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
-    "@mui/icons-material": "^6.1.9",
-    "@mui/material": "^6.1.9",
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
-    "@mui/styled-engine-sc": "^6.1.9",
     "@remix-run/node": "2.15.0",
     "@remix-run/react": "2.15.0",
     "@remix-run/serve": "^2.15.0",
